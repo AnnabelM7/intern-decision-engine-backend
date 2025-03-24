@@ -53,6 +53,23 @@ public class DecisionEngineController {
 
             return ResponseEntity.ok(response);
         } catch (InvalidPersonalCodeException | InvalidLoanAmountException | InvalidLoanPeriodException e) {
+            return handleErrorResponse(e.getMessage(), HttpStatus.BAD_REQUEST);
+        } catch (NoValidLoanException e) {
+            return handleErrorResponse(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
+            return handleErrorResponse("An unexpected error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+    private ResponseEntity<DecisionResponse> handleErrorResponse(String errorMessage, HttpStatus status) {
+        response.setLoanAmount(null);
+        response.setLoanPeriod(null);
+        response.setErrorMessage(errorMessage);
+
+        return ResponseEntity.status(status).body(response);
+    }
+
+            /* INTERN CODE
+        } catch (InvalidPersonalCodeException | InvalidLoanAmountException | InvalidLoanPeriodException e) {
             response.setLoanAmount(null);
             response.setLoanPeriod(null);
             response.setErrorMessage(e.getMessage());
@@ -72,4 +89,5 @@ public class DecisionEngineController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+             */
 }

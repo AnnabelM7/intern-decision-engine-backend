@@ -104,7 +104,7 @@ class DecisionEngineTest {
 
     @Test
     void testNoValidLoanFound() {
-        assertThrows(NoValidLoanException.class,
+        assertThrows(InvalidLoanPeriodException.class,
                 () -> decisionEngine.calculateApprovedLoan(debtorPersonalCode, 10000L, 60));
     }
 
