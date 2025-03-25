@@ -19,6 +19,11 @@ public class DecisionEngine {
     // Used to check for the validity of the presented ID code.
     private final EstonianPersonalCodeValidator validator = new EstonianPersonalCodeValidator();
     private int creditModifier = 0;
+    private AgeRestrictionService ageRestrictionService;
+
+    public DecisionEngine(AgeRestrictionService ageRestrictionService) {
+        this.ageRestrictionService = ageRestrictionService;
+    }
 
     /**
      * Calculates the maximum loan amount and period for the customer based on their ID code,
@@ -29,13 +34,14 @@ public class DecisionEngine {
      * @param personalCode ID code of the customer that made the request.
      * @param loanAmount Requested loan amount
      * @param loanPeriod Requested loan period
+     * @param countryCode Country code for the customer's country (for age restrictions)
      * @return A Decision object containing the approved loan amount and period, and an error message (if any)
      * @throws InvalidPersonalCodeException If the provided personal ID code is invalid
      * @throws InvalidLoanAmountException If the requested loan amount is invalid
      * @throws InvalidLoanPeriodException If the requested loan period is invalid
      * @throws NoValidLoanException If there is no valid loan found for the given ID code, loan amount and loan period
      */
-    public Decision calculateApprovedLoan(String personalCode, Long loanAmount, int loanPeriod)
+    public Decision calculateApprovedLoan(String personalCode, Long loanAmount, int loanPeriod, String countryCode)
             throws InvalidPersonalCodeException, InvalidLoanAmountException, InvalidLoanPeriodException,
             NoValidLoanException {
         try {
@@ -47,12 +53,17 @@ public class DecisionEngine {
         long outputLoanAmount;
         creditModifier = getCreditModifier(personalCode);
 
+
+        // Check if the customer is eligible for the loan based on age
+        if (!ageRestrictionService.isEligibleForLoan(personalCode, loanPeriod, countryCode)) {
+            throw new NoValidLoanException("Customer is not eligible for the loan due to age restrictions.");
+        }
+
         if (creditModifier == 0) {
             throw new NoValidLoanException("No valid loan found!");
         }
 
         double creditScore = ((creditModifier / (double) loanAmount) * loanPeriod) / 10;
-
         if (creditScore < 0.1) {
             throw new NoValidLoanException("No valid loan found due to low credit score!");
         }
@@ -91,7 +102,6 @@ public class DecisionEngine {
      */
     private int getCreditModifier(String personalCode) {
         int segment = Integer.parseInt(personalCode.substring(personalCode.length() - 4));
-
         if (segment < 2500) {
             return 0;
         } else if (segment < 5000) {

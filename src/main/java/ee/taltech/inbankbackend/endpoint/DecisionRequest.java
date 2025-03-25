@@ -12,4 +12,5 @@ public class DecisionRequest {
     private String personalCode;
     private Long loanAmount;
     private Integer loanPeriod;
+    private String countryCode;
 }
