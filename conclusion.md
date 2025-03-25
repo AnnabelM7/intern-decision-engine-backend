@@ -1,8 +1,9 @@
-# My conclusion for task 1
+# My conclusion for task 101
 
 ## Mistakes I found:
 * Incorrect maximum loan period.
 * Missing credit score calculation. 
+* UI had wrong loan period.
 
 ## Suggested improvements that I made:
 * DecisionEngineController
@@ -25,6 +26,12 @@
 * OCP (Open/Closed Principle) is good. New functionality (like credit score calculation) can be added with minimal changes to existing code.
 * Subtypes (InvalidLoanAmountException, InvalidPersonalCodeException) seem to substitute their base class (Exception) correctly.
 * There are no overly complex interfaces, and the current classes do not enforce implementation of methods that are not relevant.
+* UI was well done - simple and functional.
 
+# My conclusion for task 102
+* Implemented age related restrictions to decision engine.
+* Added the ability to select a country (EE, LV, LT) when applying for a loan.
+  * Adjusted age limits based on the selected country’s life expectancy.
+  * Currently, only Estonian personal codes are accepted for validation.
 
 
